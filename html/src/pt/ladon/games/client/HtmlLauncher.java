@@ -3,7 +3,7 @@ package pt.ladon.games.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import pt.ladon.games.TicTacToe;
+import pt.ladon.games.ScreenManager;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -46,6 +46,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new TicTacToe();
+                return new ScreenManager();
         }
 }

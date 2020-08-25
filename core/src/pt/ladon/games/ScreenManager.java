@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import pt.ladon.games.screens.GameScreen;
 
-public class TicTacToe extends Game {
+public class ScreenManager extends Game {
 
 	@Override
 	public void create () {

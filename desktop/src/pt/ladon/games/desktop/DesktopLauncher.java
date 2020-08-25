@@ -2,11 +2,11 @@ package pt.ladon.games.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import pt.ladon.games.TicTacToe;
+import pt.ladon.games.ScreenManager;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new TicTacToe(), config);
+		new LwjglApplication(new ScreenManager(), config);
 	}
 }
