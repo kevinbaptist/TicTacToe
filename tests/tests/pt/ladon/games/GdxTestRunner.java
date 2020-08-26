@@ -41,6 +41,7 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 
 		new HeadlessApplication(this, conf);
 		Gdx.gl = mock(GL20.class);
+		Gdx.gl20 = mock(GL20.class);
 	}
 
 	@Override
@@ -54,12 +55,13 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 	@Override
 	public void render() {
 		synchronized (invokeInRender) {
-			for (Map.Entry<FrameworkMethod, RunNotifier> each : invokeInRender.entrySet()) {
+			for(Map.Entry<FrameworkMethod, RunNotifier> each : invokeInRender.entrySet()){
 				super.runChild(each.getKey(), each.getValue());
 			}
 			invokeInRender.clear();
 		}
 	}
+
 
 	@Override
 	public void resize(int width, int height) {
@@ -76,10 +78,10 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 	@Override
 	protected void runChild(FrameworkMethod method, RunNotifier notifier) {
 		synchronized (invokeInRender) {
-			// add for invoking in render phase, where gl context is available
+			//add for invoking in render phase, where gl context is available
 			invokeInRender.put(method, notifier);
 		}
-		// wait until that test was invoked
+		//wait until that test was invoked
 		waitUntilInvokedInRenderMethod();
 	}
 
@@ -88,11 +90,10 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 	 */
 	private void waitUntilInvokedInRenderMethod() {
 		try {
-			while (true) {
+			while (true){
 				Thread.sleep(10);
 				synchronized (invokeInRender) {
-					if (invokeInRender.isEmpty())
-						break;
+					if (invokeInRender.isEmpty()) break;
 				}
 			}
 		} catch (InterruptedException e) {

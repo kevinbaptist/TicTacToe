@@ -121,6 +121,10 @@ Thumbs.db
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
 
+## Tests
+/tests/build/
+
+
 /ios-moe/xcode/*.xcodeproj/*
 !/ios-moe/xcode/*.xcodeproj/xcshareddata
 !/ios-moe/xcode/*.xcodeproj/project.pbxproj

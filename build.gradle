@@ -126,7 +126,8 @@ project(":core") {
 project(":tests") {
     apply plugin: "java"
 
-    sourceSets.test.java.srcDirs = ["src/"]
+    sourceSets.test.java.srcDirs = ["tests/"]
+    sourceSets.main.resources.srcDirs = ["../android/assets"]
 
     dependencies {
 
@@ -138,11 +139,15 @@ project(":tests") {
         implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
 
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+
         testImplementation 'junit:junit:4.+'
         testImplementation "org.mockito:mockito-all:1.9.+"
 
         testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         testImplementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+        testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     }
 }
