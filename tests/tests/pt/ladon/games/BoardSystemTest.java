@@ -12,8 +12,8 @@ import static pt.ladon.games.utils.PieceState.*;
 public class BoardSystemTest {
 	private BoardSystem boardSystem;
 
-	private static final int ROWS_EX1 = 5;
-	private static final int COLUMNS_EX1 = 6;
+	private static final short ROWS_EX1 = 5;
+	private static final short COLUMNS_EX1 = 6;
 
 	@Before
 	public void setUp() throws Exception {

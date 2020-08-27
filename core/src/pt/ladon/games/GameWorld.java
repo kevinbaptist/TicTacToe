@@ -2,12 +2,14 @@ package pt.ladon.games;
 
 import com.badlogic.ashley.core.PooledEngine;
 import pt.ladon.games.factories.EntityFactory;
+import pt.ladon.games.systems.BoardSystem;
 import pt.ladon.games.systems.RenderSystem;
 
 public class GameWorld {
-	private PooledEngine engine;
-
-	private RenderSystem renderSystem;
+	private final PooledEngine engine;
+	private final RenderSystem renderSystem;
+	
+	private static final short BOARD_ROWS = 3, COLUMNS_ROWS = 3;
 
 	public GameWorld() {
 		this.engine = new PooledEngine();
@@ -18,6 +20,7 @@ public class GameWorld {
 
 	private void addSystems() {
 		this.engine.addSystem(renderSystem);
+		this.engine.addSystem(new BoardSystem(BOARD_ROWS, COLUMNS_ROWS));
 	}
 
 	public void render(float deltaTime) {

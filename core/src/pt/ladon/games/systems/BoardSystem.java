@@ -1,18 +1,27 @@
 package pt.ladon.games.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
+import pt.ladon.games.components.MoveComponent;
 import pt.ladon.games.exceptions.InvalidPositionException;
 import pt.ladon.games.utils.PieceState;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BoardSystem {
-	private PieceState[][] board;
+public class BoardSystem extends IteratingSystem {
+	private final PieceState[][] board;
 	private PieceState nextPieceToPlay;
 	
-	private Map<PieceState, PieceState> nextMoveMapping;
+	private final Map<PieceState, PieceState> nextMoveMapping;
 
-	public BoardSystem(int rows, int columns) {
+	private final ComponentMapper<MoveComponent> playMapper = ComponentMapper.getFor(MoveComponent.class);
+
+
+	public BoardSystem(short rows, short columns) {
+		super(Family.all(MoveComponent.class).get());
 		this.board = new PieceState[rows][columns];
 		this.nextPieceToPlay = PieceState.CROSS;
 		this.nextMoveMapping = new HashMap<>();
@@ -28,11 +37,17 @@ public class BoardSystem {
 	}
 
 	private void initBoard() {
-		for (int row = 0; row < getRows(); row++) {
-			for (int column = 0; column < getColumns(); column++) {
+		for (short row = 0; row < getRows(); row++) {
+			for (short column = 0; column < getColumns(); column++) {
 				setPiece(row, column, PieceState.EMPTY);
 			}
 		}
+	}
+
+	@Override
+	protected void processEntity(Entity entity, float deltaTime) {
+		MoveComponent playComponent = playMapper.get(entity);
+		this.play(playComponent.x, playComponent.y);
 	}
 
 	public void play(int row, int column) {
