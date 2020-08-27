@@ -28,7 +28,7 @@ public class GameWorld {
 	}
 
 	private void addEntities() {
-		this.engine.addEntity(EntityFactory.createDummyObject());
+		this.engine.addEntity(EntityFactory.createMove());
 	}
 
 	

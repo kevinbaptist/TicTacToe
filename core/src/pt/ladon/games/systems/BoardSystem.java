@@ -48,6 +48,7 @@ public class BoardSystem extends IteratingSystem {
 	protected void processEntity(Entity entity, float deltaTime) {
 		MoveComponent playComponent = playMapper.get(entity);
 		this.play(playComponent.x, playComponent.y);
+		getEngine().removeEntity(entity);
 	}
 
 	public void play(int row, int column) {
