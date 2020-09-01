@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import pt.ladon.games.exceptions.InvalidPositionException;
 import pt.ladon.games.systems.BoardSystem;
+import pt.ladon.games.utils.Participant;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -17,7 +18,7 @@ public class BoardSystemTest {
 
 	@Before
 	public void setUp() throws Exception {
-		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1);
+		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1, Participant.PLAYER_1);
 	}
 
 	@Test
@@ -51,18 +52,23 @@ public class BoardSystemTest {
 	public void when_selecting_valid_position_correct_value_is_returned() {
 		assertEquals(boardSystem.getPiece(0, 0), EMPTY);
 		
-		boardSystem.play(0, 0);
+		boardSystem.play(0, 0, Participant.PLAYER_1);
 		assertEquals(boardSystem.getPiece(0, 0), CROSS);
 
 		assertEquals(boardSystem.getPiece(0, 1), EMPTY);
 
-		boardSystem.play(0, 1);
+		boardSystem.play(0, 1, Participant.PLAYER_2);
 		assertEquals(boardSystem.getPiece(0, 1), CIRCLE);
 	}
 
 	@Test
 	public void when_selecting_position_taken_exception_is_thrown() {
-		boardSystem.play(0, 0);
-		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0));
+		boardSystem.play(0, 0, Participant.PLAYER_1);
+		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
+	}
+
+	@Test
+	public void player2_cannot_play_out_of_time() {
+		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
 	}
 }
