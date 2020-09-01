@@ -3,10 +3,7 @@ package pt.ladon.games;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import pt.ladon.games.factories.EntityFactory;
-import pt.ladon.games.systems.BoardSystem;
-import pt.ladon.games.systems.InputSystem;
-import pt.ladon.games.systems.RenderSystem;
-import pt.ladon.games.systems.WorldSystem;
+import pt.ladon.games.systems.*;
 import pt.ladon.games.utils.Participant;
 
 public class GameWorld {
@@ -32,6 +29,7 @@ public class GameWorld {
 		this.engine.addSystem(boardSystem);
 		this.engine.addSystem(new InputSystem(camera));
 		this.engine.addSystem(new WorldSystem());
+		this.engine.addSystem(new IASystem());
 	}
 
 	public void render(float deltaTime) {

@@ -8,6 +8,8 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import pt.ladon.games.components.ActionComponent;
 import pt.ladon.games.exceptions.InvalidPositionException;
+import pt.ladon.games.factories.EntityFactory;
+import pt.ladon.games.models.Board;
 import pt.ladon.games.utils.Participant;
 import pt.ladon.games.utils.PieceState;
 
@@ -19,7 +21,7 @@ import java.util.Map;
  * First player start with cross
  */
 public class BoardSystem extends IteratingSystem {
-	private final PieceState[][] board;
+	private final Board board;
 	private PieceState nextPieceToPlay;
 	private final Map<PieceState, Participant> playerMappingWithPiece;
 
@@ -31,12 +33,11 @@ public class BoardSystem extends IteratingSystem {
 	public BoardSystem(short rows, short columns, Participant participant) {
 		super(Family.all(ActionComponent.class).get());
 		this.playerMappingWithPiece = new HashMap<>();
-		this.board = new PieceState[rows][columns];
+		this.board = new Board(rows, columns);
 		this.nextPieceToPlay = PieceState.CROSS;
 		this.nextMoveMapping = new HashMap<>();
 
 		this.initMapping(participant);
-		this.initBoard();
 	}
 
 	private void initMapping(Participant participant) {
@@ -47,13 +48,7 @@ public class BoardSystem extends IteratingSystem {
 		playerMappingWithPiece.put(PieceState.CIRCLE, participant == Participant.PLAYER_1 ? Participant.PLAYER_2 : Participant.PLAYER_1);
 	}
 
-	private void initBoard() {
-		for (short row = 0; row < getRows(); row++) {
-			for (short column = 0; column < getColumns(); column++) {
-				setPiece(row, column, PieceState.EMPTY);
-			}
-		}
-	}
+	
 
 	@Override
 	public void addedToEngine(Engine engine) {
@@ -62,59 +57,74 @@ public class BoardSystem extends IteratingSystem {
 
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
-		ActionComponent playComponent = playMapper.get(entity);
+		ActionComponent actionComponent = playMapper.get(entity);
 		try {
-			this.play(playComponent.row, playComponent.column, playComponent.player);
+			this.play(actionComponent.row, actionComponent.column, actionComponent.player);
 		} catch (InvalidPositionException ignored) {
-			Gdx.app.log("BoardSystem", "Invalid play by " + playComponent.player 
-					+ " at " + playComponent.row + ", " + playComponent.column);
+			logIgnoredMessage(actionComponent);
 		} finally {
-			playComponent.pieceState = getPiece(playComponent.row, playComponent.column);
+			actionComponent.pieceState = board.getPiece(actionComponent.row, actionComponent.column);
 			getEngine().removeEntity(entity);
+			if (hasGameFinished()) {
+				Gdx.app.log("Game as finished", "game has finished");
+			} 
+			
+			
 		}
 	}
 
+	private void logIgnoredMessage(ActionComponent actionComponent) {
+		Gdx.app.log("BoardSystem", "Invalid play by " + actionComponent.player
+				+ " at " + actionComponent.row + ", " + actionComponent.column);
+	}
+
 	public void play(int row, int column, Participant player) {
-		if (!isValidPlay(row, column) || !isValidPlayer(player)) {
+		if (!board.isValidPlay(row, column) || !isValidPlayer(player)) {
 			throw new InvalidPositionException();
 		}
-		Gdx.app.log("BoardSystem", "I played " + row + ", " + column + " - " + player);
-		setPiece(row, column, this.nextPieceToPlay);
+		if (hasGameFinished()) {
+			return;
+		}
+		board.movePiece(row, column, this.nextPieceToPlay);
 		switchPlayer();
 	}
 
 	private boolean isValidPlayer(Participant player) {
-		return playerMappingWithPiece.get(nextPieceToPlay) == player;
+		return getCurrentPlayer() == player;
+	}
+
+	public Participant getCurrentPlayer() {
+		return playerMappingWithPiece.get(nextPieceToPlay);
 	}
 
 	private void switchPlayer() {
 		nextPieceToPlay = nextMoveMapping.get(nextPieceToPlay);
-	}
-
-	public PieceState getPiece(int row, int column) {
-		if (!isPieceValid(row, column)) {
-			throw new InvalidPositionException();
+		if (getCurrentPlayer() == Participant.PLAYER_2) {//now it's turn of IA
+			getEngine().addEntity(EntityFactory.createIA(board, PieceState.CIRCLE));
 		}
-		return this.board[row][column];
-	}
-
-	private void setPiece(int row, int column, PieceState state) {
-		this.board[row][column] = state;
-	}
-
-	private boolean isPieceValid(int row, int column) {
-		return row < getRows() && column < getColumns();
-	}
-
-	private boolean isValidPlay(int row, int column) {
-		return getPiece(row, column) == PieceState.EMPTY;
 	}
 
 	public int getRows() {
-		return this.board.length;
+		return board.getRows();
 	}
 
 	public int getColumns() {
-		return this.board[0].length;
+		return board.getColumns();
+	}
+
+	public PieceState getPiece(int row, int col) {
+		return board.getPiece(row, col);
+	}
+
+	public boolean hasGameFinished() {
+		return board.hasGameFinished();
+	}
+
+	public boolean hasPlayerWon(PieceState piece) {
+		return board.hasWon(piece);
+	}
+
+	public String printState() {
+		return this.board.toString();
 	}
 }

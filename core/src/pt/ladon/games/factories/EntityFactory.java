@@ -3,8 +3,11 @@ package pt.ladon.games.factories;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Texture;
 import pt.ladon.games.components.ActionComponent;
+import pt.ladon.games.components.IAComponent;
 import pt.ladon.games.components.RenderComponent;
+import pt.ladon.games.models.Board;
 import pt.ladon.games.utils.Participant;
+import pt.ladon.games.utils.PieceState;
 
 import static pt.ladon.games.configurations.Configurations.PIECE_WIDTH_HEIGHT;
 
@@ -23,6 +26,15 @@ public class EntityFactory {
 		component.column = column;
 		component.player = participant;
 		entity.add(component);
+		return entity;
+	}
+
+	public static Entity createIA(Board board, PieceState myPiece) {
+		Entity entity = new Entity();
+		IAComponent iaComponent = new IAComponent();
+		iaComponent.board = board;
+		iaComponent.myPiece = myPiece;
+		entity.add(iaComponent);
 		return entity;
 	}
 

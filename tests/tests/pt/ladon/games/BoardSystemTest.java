@@ -1,24 +1,29 @@
 package pt.ladon.games;
 
+import com.badlogic.ashley.core.Engine;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import pt.ladon.games.exceptions.InvalidPositionException;
 import pt.ladon.games.systems.BoardSystem;
 import pt.ladon.games.utils.Participant;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static pt.ladon.games.utils.PieceState.*;
 
+@RunWith(GdxTestRunner.class)
 public class BoardSystemTest {
 	private BoardSystem boardSystem;
+	private Engine engine;
 
-	private static final short ROWS_EX1 = 5;
-	private static final short COLUMNS_EX1 = 6;
+	private static final short ROWS_EX1 = 3;
+	private static final short COLUMNS_EX1 = 3;
 
 	@Before
 	public void setUp() throws Exception {
+		engine = new Engine();
 		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1, Participant.PLAYER_1);
+		engine.addSystem(boardSystem);
 	}
 
 	@Test
@@ -70,5 +75,76 @@ public class BoardSystemTest {
 	@Test
 	public void player2_cannot_play_out_of_time() {
 		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
+	}
+
+	@Test
+	public void when_there_not_empty_cells_then_game_ends() {
+		assertFalse(boardSystem.hasGameFinished());
+		boardSystem.play(0, 0, Participant.PLAYER_1);
+		boardSystem.play(0, 1, Participant.PLAYER_2);
+		boardSystem.play(0, 2, Participant.PLAYER_1);
+		boardSystem.play(1, 0, Participant.PLAYER_2);
+		boardSystem.play(1, 2, Participant.PLAYER_1);
+		boardSystem.play(1, 1, Participant.PLAYER_2);
+		boardSystem.play(2, 0, Participant.PLAYER_1);
+		boardSystem.play(2, 2, Participant.PLAYER_2);
+		boardSystem.play(2, 1, Participant.PLAYER_1);
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_row_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(0, 0, Participant.PLAYER_1);
+		boardSystem.play(2, 2, Participant.PLAYER_2);
+		boardSystem.play(1, 0, Participant.PLAYER_1);
+		boardSystem.play(2, 1, Participant.PLAYER_2);
+		boardSystem.play(2, 0, Participant.PLAYER_1);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_column_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(0, 0, Participant.PLAYER_1);
+		boardSystem.play(2, 2, Participant.PLAYER_2);
+		boardSystem.play(0, 1, Participant.PLAYER_1);
+		boardSystem.play(2, 1, Participant.PLAYER_2);
+		boardSystem.play(0, 2, Participant.PLAYER_1);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_diagonal_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(0, 0, Participant.PLAYER_1);
+		boardSystem.play(2, 0, Participant.PLAYER_2);
+		boardSystem.play(1, 1, Participant.PLAYER_1);
+		boardSystem.play(2, 1, Participant.PLAYER_2);
+		boardSystem.play(2, 2, Participant.PLAYER_1);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_anti_diagonal_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(2, 0, Participant.PLAYER_1);
+		boardSystem.play(0, 0, Participant.PLAYER_2);
+		boardSystem.play(1, 1, Participant.PLAYER_1);
+		boardSystem.play(2, 1, Participant.PLAYER_2);
+		boardSystem.play(0, 2, Participant.PLAYER_1);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
 	}
 }
