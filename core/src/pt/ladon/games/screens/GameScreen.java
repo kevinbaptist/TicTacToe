@@ -15,6 +15,10 @@ public class GameScreen extends ScreenAdapter {
 		this.gameWorld.render(delta);
 	}
 
+	@Override
+	public void resize(int width, int height) {
+		gameWorld.resize(width, height);
+	}
 
 	@Override
 	public void dispose() {
