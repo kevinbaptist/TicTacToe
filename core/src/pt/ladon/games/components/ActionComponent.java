@@ -1,7 +1,6 @@
 package pt.ladon.games.components;
 
 import com.badlogic.ashley.core.Component;
-import pt.ladon.games.utils.Participant;
 import pt.ladon.games.utils.PieceState;
 
 /**
@@ -10,6 +9,5 @@ import pt.ladon.games.utils.PieceState;
 public class ActionComponent implements Component {
 	public int row;
 	public int column;
-	public Participant player;
 	public PieceState pieceState;
 }
