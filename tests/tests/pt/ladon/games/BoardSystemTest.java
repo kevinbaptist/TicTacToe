@@ -1,24 +1,29 @@
 package pt.ladon.games;
 
+import com.badlogic.ashley.core.Engine;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import pt.ladon.games.exceptions.InvalidPositionException;
+import pt.ladon.games.models.Position;
 import pt.ladon.games.systems.BoardSystem;
-import pt.ladon.games.utils.Participant;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static pt.ladon.games.utils.PieceState.*;
 
+@RunWith(GdxTestRunner.class)
 public class BoardSystemTest {
 	private BoardSystem boardSystem;
+	private Engine engine;
 
-	private static final short ROWS_EX1 = 5;
-	private static final short COLUMNS_EX1 = 6;
+	private static final short ROWS_EX1 = 3;
+	private static final short COLUMNS_EX1 = 3;
 
 	@Before
 	public void setUp() throws Exception {
-		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1, Participant.PLAYER_1);
+		engine = new Engine();
+		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1);
+		engine.addSystem(boardSystem);
 	}
 
 	@Test
@@ -52,23 +57,111 @@ public class BoardSystemTest {
 	public void when_selecting_valid_position_correct_value_is_returned() {
 		assertEquals(boardSystem.getPiece(0, 0), EMPTY);
 		
-		boardSystem.play(0, 0, Participant.PLAYER_1);
+		boardSystem.play(0, 0, CROSS);
 		assertEquals(boardSystem.getPiece(0, 0), CROSS);
 
 		assertEquals(boardSystem.getPiece(0, 1), EMPTY);
 
-		boardSystem.play(0, 1, Participant.PLAYER_2);
+		boardSystem.play(0, 1, CIRCLE);
 		assertEquals(boardSystem.getPiece(0, 1), CIRCLE);
 	}
 
 	@Test
 	public void when_selecting_position_taken_exception_is_thrown() {
-		boardSystem.play(0, 0, Participant.PLAYER_1);
-		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
+		boardSystem.play(0, 0, CROSS);
+		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, CIRCLE));
 	}
 
 	@Test
 	public void player2_cannot_play_out_of_time() {
-		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
+		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, CIRCLE));
+	}
+
+	@Test
+	public void when_there_not_empty_cells_then_game_ends() {
+		assertFalse(boardSystem.hasGameFinished());
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(0, 1, CIRCLE);
+		boardSystem.play(0, 2, CROSS);
+		boardSystem.play(1, 0, CIRCLE);
+		boardSystem.play(1, 2, CROSS);
+		boardSystem.play(1, 1, CIRCLE);
+		boardSystem.play(2, 0, CROSS);
+		boardSystem.play(2, 2, CIRCLE);
+		boardSystem.play(2, 1, CROSS);
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_row_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(2, 2, CIRCLE);
+		boardSystem.play(1, 0, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(2, 0, CROSS);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_column_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(2, 2, CIRCLE);
+		boardSystem.play(0, 1, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(0, 2, CROSS);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_diagonal_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(2, 0, CIRCLE);
+		boardSystem.play(1, 1, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(2, 2, CROSS);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void three_pieces_in_a_anti_diagonal_then_game_ends_and_player_wins() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+		boardSystem.play(2, 0, CROSS);
+		boardSystem.play(0, 0, CIRCLE);
+		boardSystem.play(1, 1, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(0, 2, CROSS);
+		assertTrue(boardSystem.hasPlayerWon(CROSS));
+		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void reset_piece() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(0, 1, CIRCLE);
+		boardSystem.play(1, 0, CROSS);
+		boardSystem.play(0, 2, CIRCLE);
+		boardSystem.resetPiece(new Position(1, 0));
+		boardSystem.play(2, 0, CROSS);
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
 	}
 }

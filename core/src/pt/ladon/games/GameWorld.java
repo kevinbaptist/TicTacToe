@@ -3,11 +3,8 @@ package pt.ladon.games;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import pt.ladon.games.factories.EntityFactory;
-import pt.ladon.games.systems.BoardSystem;
-import pt.ladon.games.systems.InputSystem;
-import pt.ladon.games.systems.RenderSystem;
-import pt.ladon.games.systems.WorldSystem;
-import pt.ladon.games.utils.Participant;
+import pt.ladon.games.systems.*;
+
 
 public class GameWorld {
 	private final PooledEngine engine;
@@ -21,7 +18,7 @@ public class GameWorld {
 		this.engine = new PooledEngine();
 		this.camera = new OrthographicCamera();
 		this.renderSystem = new RenderSystem(camera);
-		this.boardSystem = new BoardSystem(BOARD_ROWS, COLUMNS_ROWS, Participant.PLAYER_1);
+		this.boardSystem = new BoardSystem(BOARD_ROWS, COLUMNS_ROWS);
 		
 		addSystems();
 		addEntities();
@@ -32,6 +29,7 @@ public class GameWorld {
 		this.engine.addSystem(boardSystem);
 		this.engine.addSystem(new InputSystem(camera));
 		this.engine.addSystem(new WorldSystem());
+		this.engine.addSystem(new IASystem());
 	}
 
 	public void render(float deltaTime) {
