@@ -6,7 +6,6 @@ import pt.ladon.games.components.ActionComponent;
 import pt.ladon.games.components.IAComponent;
 import pt.ladon.games.components.RenderComponent;
 import pt.ladon.games.models.Board;
-import pt.ladon.games.utils.Participant;
 import pt.ladon.games.utils.PieceState;
 
 import static pt.ladon.games.configurations.Configurations.PIECE_WIDTH_HEIGHT;
@@ -19,12 +18,12 @@ public class EntityFactory {
 	public static final Texture CIRCLE = new Texture("circle.png");
 	public static final Texture EMPTY_CELL = new Texture("badlogic.jpg");
 
-	public static Entity createAction(int row, int column, Participant participant) {
+	public static Entity createAction(int row, int column, PieceState state) {
 		Entity entity = new Entity();
 		ActionComponent component = new ActionComponent();
 		component.row = row;
 		component.column = column;
-		component.player = participant;
+		component.pieceState = state;
 		entity.add(component);
 		return entity;
 	}

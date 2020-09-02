@@ -77,13 +77,13 @@ public class Board {
 	}
 
 	public boolean isValidPlay(int row, int column) {
-		return getPiece(row, column) == PieceState.EMPTY;
+		return isEmptyCell(row, column);
 	}
 
 	public boolean hasEmptyCells() {
 		for (int row = 0; row < getRows(); row++) {
 			for (int col = 0; col < getColumns(); col++) {
-				if (getPiece(row, col) == PieceState.EMPTY) {
+				if (isEmptyCell(row, col)) {
 					return true;
 				}
 			}
@@ -121,9 +121,11 @@ public class Board {
 		return !hasEmptyCells() || hasWon(PieceState.CIRCLE) || hasWon(PieceState.CROSS);
 	}
 
-	private static class Number {
-		protected int value;
+	public boolean isEmptyCell(int row, int col) {
+		return getPiece(row, col) == PieceState.EMPTY;
 	}
+	
+	
 
 	@Override
 	public String toString() {
@@ -135,5 +137,10 @@ public class Board {
 			br.append("\n");
 		}
 		return br.toString();
+	}
+
+
+	private static class Number {
+		protected int value;
 	}
 }

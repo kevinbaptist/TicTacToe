@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import pt.ladon.games.exceptions.InvalidPositionException;
 import pt.ladon.games.systems.BoardSystem;
-import pt.ladon.games.utils.Participant;
 
 import static org.junit.Assert.*;
 import static pt.ladon.games.utils.PieceState.*;
@@ -22,7 +21,7 @@ public class BoardSystemTest {
 	@Before
 	public void setUp() throws Exception {
 		engine = new Engine();
-		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1, Participant.PLAYER_1);
+		boardSystem = new BoardSystem(ROWS_EX1, COLUMNS_EX1);
 		engine.addSystem(boardSystem);
 	}
 
@@ -57,38 +56,38 @@ public class BoardSystemTest {
 	public void when_selecting_valid_position_correct_value_is_returned() {
 		assertEquals(boardSystem.getPiece(0, 0), EMPTY);
 		
-		boardSystem.play(0, 0, Participant.PLAYER_1);
+		boardSystem.play(0, 0, CROSS);
 		assertEquals(boardSystem.getPiece(0, 0), CROSS);
 
 		assertEquals(boardSystem.getPiece(0, 1), EMPTY);
 
-		boardSystem.play(0, 1, Participant.PLAYER_2);
+		boardSystem.play(0, 1, CIRCLE);
 		assertEquals(boardSystem.getPiece(0, 1), CIRCLE);
 	}
 
 	@Test
 	public void when_selecting_position_taken_exception_is_thrown() {
-		boardSystem.play(0, 0, Participant.PLAYER_1);
-		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
+		boardSystem.play(0, 0, CROSS);
+		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, CIRCLE));
 	}
 
 	@Test
 	public void player2_cannot_play_out_of_time() {
-		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, Participant.PLAYER_2));
+		assertThrows(InvalidPositionException.class, () -> boardSystem.play(0, 0, CIRCLE));
 	}
 
 	@Test
 	public void when_there_not_empty_cells_then_game_ends() {
 		assertFalse(boardSystem.hasGameFinished());
-		boardSystem.play(0, 0, Participant.PLAYER_1);
-		boardSystem.play(0, 1, Participant.PLAYER_2);
-		boardSystem.play(0, 2, Participant.PLAYER_1);
-		boardSystem.play(1, 0, Participant.PLAYER_2);
-		boardSystem.play(1, 2, Participant.PLAYER_1);
-		boardSystem.play(1, 1, Participant.PLAYER_2);
-		boardSystem.play(2, 0, Participant.PLAYER_1);
-		boardSystem.play(2, 2, Participant.PLAYER_2);
-		boardSystem.play(2, 1, Participant.PLAYER_1);
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(0, 1, CIRCLE);
+		boardSystem.play(0, 2, CROSS);
+		boardSystem.play(1, 0, CIRCLE);
+		boardSystem.play(1, 2, CROSS);
+		boardSystem.play(1, 1, CIRCLE);
+		boardSystem.play(2, 0, CROSS);
+		boardSystem.play(2, 2, CIRCLE);
+		boardSystem.play(2, 1, CROSS);
 		assertTrue(boardSystem.hasGameFinished());
 	}
 
@@ -97,11 +96,11 @@ public class BoardSystemTest {
 		assertFalse(boardSystem.hasGameFinished());
 		assertFalse(boardSystem.hasPlayerWon(CROSS));
 		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
-		boardSystem.play(0, 0, Participant.PLAYER_1);
-		boardSystem.play(2, 2, Participant.PLAYER_2);
-		boardSystem.play(1, 0, Participant.PLAYER_1);
-		boardSystem.play(2, 1, Participant.PLAYER_2);
-		boardSystem.play(2, 0, Participant.PLAYER_1);
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(2, 2, CIRCLE);
+		boardSystem.play(1, 0, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(2, 0, CROSS);
 		assertTrue(boardSystem.hasPlayerWon(CROSS));
 		assertTrue(boardSystem.hasGameFinished());
 	}
@@ -111,11 +110,11 @@ public class BoardSystemTest {
 		assertFalse(boardSystem.hasGameFinished());
 		assertFalse(boardSystem.hasPlayerWon(CROSS));
 		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
-		boardSystem.play(0, 0, Participant.PLAYER_1);
-		boardSystem.play(2, 2, Participant.PLAYER_2);
-		boardSystem.play(0, 1, Participant.PLAYER_1);
-		boardSystem.play(2, 1, Participant.PLAYER_2);
-		boardSystem.play(0, 2, Participant.PLAYER_1);
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(2, 2, CIRCLE);
+		boardSystem.play(0, 1, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(0, 2, CROSS);
 		assertTrue(boardSystem.hasPlayerWon(CROSS));
 		assertTrue(boardSystem.hasGameFinished());
 	}
@@ -125,11 +124,11 @@ public class BoardSystemTest {
 		assertFalse(boardSystem.hasGameFinished());
 		assertFalse(boardSystem.hasPlayerWon(CROSS));
 		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
-		boardSystem.play(0, 0, Participant.PLAYER_1);
-		boardSystem.play(2, 0, Participant.PLAYER_2);
-		boardSystem.play(1, 1, Participant.PLAYER_1);
-		boardSystem.play(2, 1, Participant.PLAYER_2);
-		boardSystem.play(2, 2, Participant.PLAYER_1);
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(2, 0, CIRCLE);
+		boardSystem.play(1, 1, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(2, 2, CROSS);
 		assertTrue(boardSystem.hasPlayerWon(CROSS));
 		assertTrue(boardSystem.hasGameFinished());
 	}
@@ -139,11 +138,11 @@ public class BoardSystemTest {
 		assertFalse(boardSystem.hasGameFinished());
 		assertFalse(boardSystem.hasPlayerWon(CROSS));
 		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
-		boardSystem.play(2, 0, Participant.PLAYER_1);
-		boardSystem.play(0, 0, Participant.PLAYER_2);
-		boardSystem.play(1, 1, Participant.PLAYER_1);
-		boardSystem.play(2, 1, Participant.PLAYER_2);
-		boardSystem.play(0, 2, Participant.PLAYER_1);
+		boardSystem.play(2, 0, CROSS);
+		boardSystem.play(0, 0, CIRCLE);
+		boardSystem.play(1, 1, CROSS);
+		boardSystem.play(2, 1, CIRCLE);
+		boardSystem.play(0, 2, CROSS);
 		assertTrue(boardSystem.hasPlayerWon(CROSS));
 		assertTrue(boardSystem.hasGameFinished());
 	}

@@ -10,42 +10,40 @@ import pt.ladon.games.components.ActionComponent;
 import pt.ladon.games.exceptions.InvalidPositionException;
 import pt.ladon.games.factories.EntityFactory;
 import pt.ladon.games.models.Board;
-import pt.ladon.games.utils.Participant;
+import pt.ladon.games.models.Position;
 import pt.ladon.games.utils.PieceState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Listen to all ActionComponent... which could be from a player or IA
- * First player start with cross
+ * Cross Always start
  */
 public class BoardSystem extends IteratingSystem {
 	private final Board board;
 	private PieceState nextPieceToPlay;
-	private final Map<PieceState, Participant> playerMappingWithPiece;
 
 	private final Map<PieceState, PieceState> nextMoveMapping;
 
 	private final ComponentMapper<ActionComponent> playMapper = ComponentMapper.getFor(ActionComponent.class);
 
 
-	public BoardSystem(short rows, short columns, Participant participant) {
+	public BoardSystem(short rows, short columns) {
 		super(Family.all(ActionComponent.class).get());
-		this.playerMappingWithPiece = new HashMap<>();
 		this.board = new Board(rows, columns);
 		this.nextPieceToPlay = PieceState.CROSS;
 		this.nextMoveMapping = new HashMap<>();
 
-		this.initMapping(participant);
+		this.initMapping();
 	}
 
-	private void initMapping(Participant participant) {
+	private void initMapping() {
 		nextMoveMapping.put(PieceState.EMPTY, PieceState.CROSS);
 		nextMoveMapping.put(PieceState.CROSS, PieceState.CIRCLE);
 		nextMoveMapping.put(PieceState.CIRCLE, PieceState.CROSS);
-		playerMappingWithPiece.put(PieceState.CROSS, participant);
-		playerMappingWithPiece.put(PieceState.CIRCLE, participant == Participant.PLAYER_1 ? Participant.PLAYER_2 : Participant.PLAYER_1);
 	}
 
 	
@@ -59,7 +57,7 @@ public class BoardSystem extends IteratingSystem {
 	protected void processEntity(Entity entity, float deltaTime) {
 		ActionComponent actionComponent = playMapper.get(entity);
 		try {
-			this.play(actionComponent.row, actionComponent.column, actionComponent.player);
+			this.play(actionComponent.row, actionComponent.column, actionComponent.pieceState);
 		} catch (InvalidPositionException ignored) {
 			logIgnoredMessage(actionComponent);
 		} finally {
@@ -74,12 +72,12 @@ public class BoardSystem extends IteratingSystem {
 	}
 
 	private void logIgnoredMessage(ActionComponent actionComponent) {
-		Gdx.app.log("BoardSystem", "Invalid play by " + actionComponent.player
+		Gdx.app.log("BoardSystem", "Invalid play by " + actionComponent.pieceState
 				+ " at " + actionComponent.row + ", " + actionComponent.column);
 	}
 
-	public void play(int row, int column, Participant player) {
-		if (!board.isValidPlay(row, column) || !isValidPlayer(player)) {
+	public void play(int row, int column, PieceState state) {
+		if (!board.isValidPlay(row, column) || !isValidPlayer(state)) {
 			throw new InvalidPositionException();
 		}
 		if (hasGameFinished()) {
@@ -89,17 +87,14 @@ public class BoardSystem extends IteratingSystem {
 		switchPlayer();
 	}
 
-	private boolean isValidPlayer(Participant player) {
-		return getCurrentPlayer() == player;
+	private boolean isValidPlayer(PieceState state) {
+		return nextPieceToPlay == state;
 	}
-
-	public Participant getCurrentPlayer() {
-		return playerMappingWithPiece.get(nextPieceToPlay);
-	}
+	
 
 	private void switchPlayer() {
 		nextPieceToPlay = nextMoveMapping.get(nextPieceToPlay);
-		if (getCurrentPlayer() == Participant.PLAYER_2) {//now it's turn of IA
+		if (nextPieceToPlay == PieceState.CIRCLE) {
 			getEngine().addEntity(EntityFactory.createIA(board, PieceState.CIRCLE));
 		}
 	}
@@ -126,5 +121,19 @@ public class BoardSystem extends IteratingSystem {
 
 	public String printState() {
 		return this.board.toString();
+	}
+
+	
+
+	public List<Position> getAvailableMoves() {
+		List<Position> emptyCells = new ArrayList<>();
+		for (int row = 0; row < getRows(); row++) {
+			for (int col = 0; col < getColumns(); col++) {
+				if (board.isEmptyCell(row, col)) {
+					emptyCells.add(new Position(row, col));
+				}
+			}
+		}
+		return emptyCells;
 	}
 }

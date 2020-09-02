@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import pt.ladon.games.components.RenderComponent;
 import pt.ladon.games.factories.EntityFactory;
-import pt.ladon.games.utils.Participant;
+import pt.ladon.games.utils.PieceState;
 
 import static com.badlogic.gdx.math.MathUtils.floor;
 import static pt.ladon.games.configurations.Configurations.PIECE_WIDTH_HEIGHT;
@@ -59,7 +59,7 @@ public class InputSystem extends EntitySystem {
 		Entity action = EntityFactory.createAction(
 				floor(x / PIECE_WIDTH_HEIGHT), 
 				floor(y / PIECE_WIDTH_HEIGHT),
-				Participant.PLAYER_1);
+				PieceState.CROSS);
 		getEngine().addEntity(action);
 	}
 }

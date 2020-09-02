@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import pt.ladon.games.factories.EntityFactory;
 import pt.ladon.games.systems.*;
-import pt.ladon.games.utils.Participant;
+
 
 public class GameWorld {
 	private final PooledEngine engine;
@@ -18,7 +18,7 @@ public class GameWorld {
 		this.engine = new PooledEngine();
 		this.camera = new OrthographicCamera();
 		this.renderSystem = new RenderSystem(camera);
-		this.boardSystem = new BoardSystem(BOARD_ROWS, COLUMNS_ROWS, Participant.PLAYER_1);
+		this.boardSystem = new BoardSystem(BOARD_ROWS, COLUMNS_ROWS);
 		
 		addSystems();
 		addEntities();
