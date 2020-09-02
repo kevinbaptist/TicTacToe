@@ -95,7 +95,7 @@ public class BoardSystem extends IteratingSystem {
 	private void switchPlayer() {
 		nextPieceToPlay = nextMoveMapping.get(nextPieceToPlay);
 		if (nextPieceToPlay == PieceState.CIRCLE) {
-			getEngine().addEntity(EntityFactory.createIA(board, PieceState.CIRCLE));
+			getEngine().addEntity(EntityFactory.createIA(board));
 		}
 	}
 

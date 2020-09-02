@@ -18,7 +18,7 @@ public class EntityFactory {
 	public static final Texture CIRCLE = new Texture("circle.png");
 	public static final Texture EMPTY_CELL = new Texture("badlogic.jpg");
 
-	public static Entity createAction(int row, int column, PieceState state) {
+	private static Entity createAction(int row, int column, PieceState state) {
 		Entity entity = new Entity();
 		ActionComponent component = new ActionComponent();
 		component.row = row;
@@ -28,11 +28,17 @@ public class EntityFactory {
 		return entity;
 	}
 
-	public static Entity createIA(Board board, PieceState myPiece) {
+	public static Entity createIAAction(int row, int column) {
+		return createAction(row, column, PieceState.CIRCLE);
+	}
+	public static Entity createPlayerAction(int row, int column) {
+		return createAction(row, column, PieceState.CROSS);
+	}
+	public static Entity createIA(Board board) {
 		Entity entity = new Entity();
 		IAComponent iaComponent = new IAComponent();
 		iaComponent.board = board;
-		iaComponent.myPiece = myPiece;
+		iaComponent.myPiece = PieceState.CIRCLE;
 		entity.add(iaComponent);
 		return entity;
 	}

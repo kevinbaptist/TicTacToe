@@ -30,7 +30,7 @@ public class IASystem extends IteratingSystem {
 		for (int row = 0; row < board.getRows(); row++) {
 			for (int column = 0; column < board.getColumns(); column++) {
 				if (board.getPiece(row, column) == PieceState.EMPTY) {
-					Entity action = EntityFactory.createAction(row, column, PieceState.CROSS);
+					Entity action = EntityFactory.createIAAction(row, column);
 					getEngine().addEntity(action);
 				}
 			}
