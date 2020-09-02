@@ -15,8 +15,8 @@ public class RenderSystemClass {
 
 	@Test
 	public void images_exists() {
-		assertTrue("Failure to load badlogic.png", Gdx.files.internal("badlogic.jpg").exists());
-		assertTrue("Failure to load cross.jpg", Gdx.files.internal("cross.png").exists());
-		assertTrue("Failure to load circle.png", Gdx.files.internal("circle.png").exists());
+		assertTrue("Failure to load empty.jpg", Gdx.files.internal("empty.jpg").exists());
+		assertTrue("Failure to load cross.jpg", Gdx.files.internal("cross.jpg").exists());
+		assertTrue("Failure to load circle.jpg", Gdx.files.internal("circle.png").exists());
 	}
 }

@@ -15,8 +15,8 @@ import static pt.ladon.games.configurations.Configurations.PIECE_WIDTH_HEIGHT;
  */
 public class EntityFactory {
 	public static final Texture CROSS = new Texture("cross.jpg");
-	public static final Texture CIRCLE = new Texture("circle.png");
-	public static final Texture EMPTY_CELL = new Texture("badlogic.jpg");
+	public static final Texture CIRCLE = new Texture("circle.jpg");
+	public static final Texture EMPTY_CELL = new Texture("empty.jpg");
 
 	private static Entity createAction(int row, int column, PieceState state) {
 		Entity entity = new Entity();
