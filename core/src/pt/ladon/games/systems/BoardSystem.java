@@ -13,9 +13,7 @@ import pt.ladon.games.models.Board;
 import pt.ladon.games.models.Position;
 import pt.ladon.games.utils.PieceState;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,7 +82,8 @@ public class BoardSystem extends IteratingSystem {
 			return;
 		}
 		board.movePiece(row, column, this.nextPieceToPlay);
-		switchPlayer();
+		if (!hasGameFinished())
+			switchPlayer();
 	}
 
 	private boolean isValidPlayer(PieceState state) {
@@ -123,17 +122,15 @@ public class BoardSystem extends IteratingSystem {
 		return this.board.toString();
 	}
 
-	
+	public PieceState getNextPieceToPlay() {
+		return nextPieceToPlay;
+	}
 
-	public List<Position> getAvailableMoves() {
-		List<Position> emptyCells = new ArrayList<>();
-		for (int row = 0; row < getRows(); row++) {
-			for (int col = 0; col < getColumns(); col++) {
-				if (board.isEmptyCell(row, col)) {
-					emptyCells.add(new Position(row, col));
-				}
-			}
-		}
-		return emptyCells;
+	public void resetPiece(Position position) {
+		board.resetPiece(position);
+	}
+
+	public boolean hasWon(PieceState state) {
+		return this.board.hasWon(state);
 	}
 }

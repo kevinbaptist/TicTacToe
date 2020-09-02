@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import pt.ladon.games.exceptions.InvalidPositionException;
+import pt.ladon.games.models.Position;
 import pt.ladon.games.systems.BoardSystem;
 
 import static org.junit.Assert.*;
@@ -145,5 +146,22 @@ public class BoardSystemTest {
 		boardSystem.play(0, 2, CROSS);
 		assertTrue(boardSystem.hasPlayerWon(CROSS));
 		assertTrue(boardSystem.hasGameFinished());
+	}
+
+	@Test
+	public void reset_piece() {
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
+
+		boardSystem.play(0, 0, CROSS);
+		boardSystem.play(0, 1, CIRCLE);
+		boardSystem.play(1, 0, CROSS);
+		boardSystem.play(0, 2, CIRCLE);
+		boardSystem.resetPiece(new Position(1, 0));
+		boardSystem.play(2, 0, CROSS);
+		assertFalse(boardSystem.hasGameFinished());
+		assertFalse(boardSystem.hasPlayerWon(CROSS));
+		assertFalse(boardSystem.hasPlayerWon(CIRCLE));
 	}
 }

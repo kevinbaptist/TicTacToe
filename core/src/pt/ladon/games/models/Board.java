@@ -3,7 +3,9 @@ package pt.ladon.games.models;
 import pt.ladon.games.exceptions.InvalidPositionException;
 import pt.ladon.games.utils.PieceState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -64,15 +66,19 @@ public class Board {
 	}
 
 	public void movePiece(int row, int column, PieceState state) {
+		updateState(row, column, state, 1);
+	}
+
+	private void updateState(int row, int column, PieceState state, int value) {
 		this.board[row][column] = state;
-		this.rowsState.get(state)[row]++;
-		this.columnsState.get(state)[column]++;
+		this.rowsState.get(state)[row] += value;
+		this.columnsState.get(state)[column] += value;
 
 		if (row == column) {
-			diagonalState.get(state).value++;
+			diagonalState.get(state).value += value;
 		}
 		if (row + column == 2) {
-			antiDiagonalState.get(state).value++;
+			antiDiagonalState.get(state).value += value;
 		}
 	}
 
@@ -105,7 +111,7 @@ public class Board {
 				return true;
 			}
 		}
-		return false;	
+		return false;
 	}
 
 	public boolean hasCompletedRow(PieceState piece) {
@@ -124,8 +130,7 @@ public class Board {
 	public boolean isEmptyCell(int row, int col) {
 		return getPiece(row, col) == PieceState.EMPTY;
 	}
-	
-	
+
 
 	@Override
 	public String toString() {
@@ -139,6 +144,24 @@ public class Board {
 		return br.toString();
 	}
 
+	public List<Position> getPossibleMoves() {
+		List<Position> emptyCells = new ArrayList<>();
+		for (int row = 0; row < getRows(); row++) {
+			for (int col = 0; col < getColumns(); col++) {
+				if (isEmptyCell(row, col)) {
+					emptyCells.add(new Position(row, col));
+				}
+			}
+		}
+		return emptyCells;
+	}
+
+	public void resetPiece(Position position) {
+		PieceState pieceState = this.board[position.getRow()][position.getColumn()];
+		updateState(position.getRow(), position.getColumn(), pieceState, -1);
+		this.board[position.getRow()][position.getColumn()] = PieceState.EMPTY;
+
+	}
 
 	private static class Number {
 		protected int value;

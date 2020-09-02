@@ -7,6 +7,8 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import pt.ladon.games.components.IAComponent;
 import pt.ladon.games.factories.EntityFactory;
 import pt.ladon.games.models.Board;
+import pt.ladon.games.models.Minimax;
+import pt.ladon.games.models.Position;
 import pt.ladon.games.utils.PieceState;
 
 /**
@@ -14,26 +16,30 @@ import pt.ladon.games.utils.PieceState;
  */
 public class IASystem extends IteratingSystem {
 	private final ComponentMapper<IAComponent> iaMapper = ComponentMapper.getFor(IAComponent.class);
-
+	private final Minimax minimax;
 	public IASystem() {
 		super(Family.all(IAComponent.class).get());
+		minimax = new Minimax();
 	}
 
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
 		Board board = iaMapper.get(entity).board;
-		playUsingPredefinedRules(board);
+		Position bestMove = getBestMove(board);
+		Entity action = EntityFactory.createIAAction(bestMove.getRow(), bestMove.getColumn());
+		updateEngine(entity, action);
+	}
+
+	private void updateEngine(Entity entity, Entity action) {
+		getEngine().addEntity(action);
 		getEngine().removeEntity(entity);
 	}
-	
-	private void playUsingPredefinedRules(Board board) {
-		for (int row = 0; row < board.getRows(); row++) {
-			for (int column = 0; column < board.getColumns(); column++) {
-				if (board.getPiece(row, column) == PieceState.EMPTY) {
-					Entity action = EntityFactory.createIAAction(row, column);
-					getEngine().addEntity(action);
-				}
-			}
-		}
+
+	private Position getBestMove(Board board) {
+		minimax.calculate(board, PieceState.CIRCLE);
+		Position position = minimax.returnBestMove();
+		minimax.reset();
+		return position;
 	}
+	
 }
